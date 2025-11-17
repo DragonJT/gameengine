@@ -38,12 +38,13 @@ unsafe extern "C" {
     pub fn draw_triangle_arrays(num_vertices: u32);
     pub fn swap_buffers();
     pub fn poll_events();
-    pub fn create_texture(ptr: *const u8, width: i32, height: i32, nrChannels: i32) -> u32;
+    pub fn create_texture() -> u32;
+    pub fn tex_image_2d(ptr: *const u8, width: i32, height: i32, channels: i32);
+    pub fn generate_mipmap_2d();
     pub fn update_vertices_static(ptr: *const u8, size: u32);
     pub fn update_vertices_dynamic(ptr: *const u8, size: u32);
     pub fn vertex_attrib_pointer_float(id: u32, count: i32, stride: u32, ptr: usize);
     pub fn enable_transparency();
     pub fn window_should_close() -> i32;
-    pub fn render(num_vertices: u32);
     pub fn get_window_size() -> math::Vec2i;
 }

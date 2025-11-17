@@ -1,6 +1,6 @@
 use crate::c;
 use crate::helper_functions::*;
-use math::*;
+use math::{mat4::*, *};
 
 pub struct TextRenderer {
     vertices: Vec<f32>,
@@ -50,7 +50,8 @@ impl TextRenderer {
             *fontdata
                 .atlas_bitmap
                 .add((atlas_size * atlas_size - 1) as usize) = 255u8;
-            let texture = c::create_texture(fontdata.atlas_bitmap, atlas_size, atlas_size, 1);
+            let texture = c::create_texture();
+            c::tex_image_2d(fontdata.atlas_bitmap, atlas_size, atlas_size, 1);
             let vao = c::create_vao();
             let vbo = c::create_vbo();
             c::enable_transparency();
@@ -90,11 +91,7 @@ impl TextRenderer {
                 1.0,
             );
             set_matrix(self.program, "view", view.to_f32_ptr());
-            c::viewport(0, 0, window_size.x, window_size.y);
-            c::clear_color_buffer_bit(1.0, 1.0, 1.0, 1.0);
             c::draw_triangle_arrays(self.vertex_count);
-            c::swap_buffers();
-            c::poll_events();
             self.clear_vertices();
         }
     }
@@ -104,54 +101,26 @@ impl TextRenderer {
         self.vertex_count = 0;
     }
 
-    pub fn draw_triangle(&mut self, a: &Vec2, b: &Vec2, c: &Vec2, color: &Color) {
+    pub fn draw_triangle(&mut self, triangle: &Triangle2, color: &Color) {
         let vertices = &mut self.vertices;
         let uv = (self.atlas_size as f32 - 0.5) / self.atlas_size as f32;
         self.vertex_count += 3;
-        add_vector2(vertices, a.x, a.y);
+        add_vector2(vertices, triangle.a.x, triangle.a.y);
         add_vector2(vertices, uv, uv);
         add_color(vertices, color);
 
-        add_vector2(vertices, b.x, b.y);
+        add_vector2(vertices, triangle.b.x, triangle.b.y);
         add_vector2(vertices, uv, uv);
         add_color(vertices, color);
 
-        add_vector2(vertices, c.x, c.y);
+        add_vector2(vertices, triangle.c.x, triangle.c.y);
         add_vector2(vertices, uv, uv);
         add_color(vertices, color);
     }
 
     pub fn draw_rect(&mut self, rect: &Rect, color: &Color) {
-        self.draw_triangle(
-            &Vec2 {
-                x: rect.x,
-                y: rect.y,
-            },
-            &Vec2 {
-                x: rect.x + rect.w,
-                y: rect.y,
-            },
-            &Vec2 {
-                x: rect.x + rect.w,
-                y: rect.y + rect.h,
-            },
-            color,
-        );
-        self.draw_triangle(
-            &Vec2 {
-                x: rect.x,
-                y: rect.y,
-            },
-            &Vec2 {
-                x: rect.x + rect.w,
-                y: rect.y + rect.h,
-            },
-            &Vec2 {
-                x: rect.x,
-                y: rect.y + rect.h,
-            },
-            color,
-        );
+        self.draw_triangle(&rect.tri1(), color);
+        self.draw_triangle(&rect.tri2(), color);
     }
 
     pub fn draw_char(&mut self, x: f32, y: f32, c: char, font_height: f32, color: &Color) -> f32 {

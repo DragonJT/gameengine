@@ -65,7 +65,7 @@ struct FontData create_font_data(const char *ttf_path, float pixel_height, int a
     return fontdata;
 }
 
-unsigned int create_texture(uint8_t* ptr, int width, int height, int nrChannels){
+unsigned int create_texture(){
     unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -75,14 +75,26 @@ unsigned int create_texture(uint8_t* ptr, int width, int height, int nrChannels)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     // load and generate the texture
-    if(nrChannels == 1){
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, ptr);
+    return texture;
+}
+
+void tex_image_2d(uint8_t* ptr, int width, int height, int channels){
+    if(channels == 1){
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, ptr);
+    }
+    else if(channels == 3){
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptr);
+    }
+    else if(channels == 4){
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, ptr);
     }
     else{
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptr);
+        printf("channels should be 1, 3 or 4");
     }
+}
+
+void generate_mipmap_2d(){
     glGenerateMipmap(GL_TEXTURE_2D);
-    return texture;
 }
 
 void viewport(int x, int y, int w, int h){

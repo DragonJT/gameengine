@@ -1,4 +1,5 @@
 use math::*;
+pub mod basic_lighting;
 mod c;
 mod helper_functions;
 pub mod text_renderer;
@@ -41,5 +42,11 @@ pub fn clear_color_buffer_bit(r: f32, g: f32, b: f32, a: f32) {
 pub fn swap_buffers() {
     unsafe {
         c::swap_buffers();
+    }
+}
+
+pub fn enable_transparency() {
+    unsafe {
+        c::enable_transparency();
     }
 }

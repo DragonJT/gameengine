@@ -192,9 +192,14 @@ unsigned int initialize_program(char* vertexSource, char* fragmentSource){
     return program;
 }
 
-void set_matrix(unsigned int program, char* name, float* ptr){
+void set_matrix4(unsigned int program, char* name, float* ptr){
     unsigned int loc = glGetUniformLocation(program, name);
     glUniformMatrix4fv(loc, 1, GL_TRUE, ptr);
+}
+
+void set_vector3(unsigned int program, char* name, float x, float y, float z){
+    unsigned int loc = glGetUniformLocation(program, name);
+    glUniform3f(loc, x, y, z);
 }
 
 void bind_program(unsigned int program){

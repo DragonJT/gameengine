@@ -2,11 +2,18 @@ pub mod mat4;
 pub mod quat;
 pub mod texture;
 pub mod vec3;
+use crate::vec3::*;
 
 pub struct Triangle2 {
     pub a: Vec2,
     pub b: Vec2,
     pub c: Vec2,
+}
+
+pub struct Triangle3 {
+    pub a: Vec3,
+    pub b: Vec3,
+    pub c: Vec3,
 }
 
 #[repr(C)]
@@ -15,9 +22,16 @@ pub struct Vec2i {
     pub y: i32,
 }
 
+#[derive(Clone)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
+}
+
+impl Vec2 {
+    pub fn new(x: f32, y: f32) -> Vec2 {
+        Vec2 { x, y }
+    }
 }
 
 pub struct Rect {
@@ -99,5 +113,13 @@ impl Color {
 
     pub fn white() -> Color {
         Color::new(1.0, 1.0, 1.0, 1.0)
+    }
+
+    pub fn to_vec3(&self) -> Vec3 {
+        Vec3 {
+            x: self.r,
+            y: self.g,
+            z: self.b,
+        }
     }
 }

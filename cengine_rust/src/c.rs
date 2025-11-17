@@ -22,7 +22,8 @@ unsafe extern "C" {
     pub fn initialize_program(vertex_souce: *const c_char, fragment_source: *const c_char) -> u32;
     pub fn create_vao() -> u32;
     pub fn create_vbo() -> u32;
-    pub fn set_matrix(program: u32, name: *const c_char, ptr: *const f32);
+    pub fn set_matrix4(program: u32, name: *const c_char, ptr: *const f32);
+    pub fn set_vector3(program: u32, name: *const c_char, x: f32, y: f32, z: f32);
     pub fn bind_program(program: u32);
     pub fn bind_vao(vao: u32);
     pub fn bind_vbo(vbo: u32);

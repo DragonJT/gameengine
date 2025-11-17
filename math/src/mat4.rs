@@ -42,15 +42,59 @@ impl Mat4 {
         }
     }
 
+    pub fn perspective(fov_y: f32, aspect: f32, znear: f32, zfar: f32) -> Self {
+        let f = 1.0 / (fov_y * 0.5).tan();
+        let a = f / aspect;
+        let b = (zfar + znear) / (znear - zfar);
+        let c = (2.0 * zfar * znear) / (znear - zfar);
+
+        Mat4 {
+            m: [
+                a, 0.0, 0.0, 0.0, 0.0, f, 0.0, 0.0, 0.0, 0.0, b, c, 0.0, 0.0, -1.0, 0.0,
+            ],
+        }
+    }
+
+    pub fn look_at(eye: Vec3, target: Vec3, up: Vec3) -> Self {
+        let f = (target - eye).normalized(); // forward
+        let s = f.cross(up).normalized(); // right
+        let u = s.cross(f); // recalculated up
+
+        Mat4 {
+            m: [
+                // row 0
+                s.x,
+                s.y,
+                s.z,
+                -s.dot(eye),
+                // row 1
+                u.x,
+                u.y,
+                u.z,
+                -u.dot(eye),
+                // row 2
+                -f.x,
+                -f.y,
+                -f.z,
+                f.dot(eye),
+                // row 3
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+            ],
+        }
+    }
+
     #[inline]
-    pub fn from_translation(t: Vec3) -> Self {
+    pub fn translate(t: Vec3) -> Self {
         Mat4::new(
             1.0, 0.0, 0.0, t.x, 0.0, 1.0, 0.0, t.y, 0.0, 0.0, 1.0, t.z, 0.0, 0.0, 0.0, 1.0,
         )
     }
 
     #[inline]
-    pub fn from_scale(s: Vec3) -> Self {
+    pub fn scale(s: Vec3) -> Self {
         Mat4::new(
             s.x, 0.0, 0.0, 0.0, 0.0, s.y, 0.0, 0.0, 0.0, 0.0, s.z, 0.0, 0.0, 0.0, 0.0, 1.0,
         )

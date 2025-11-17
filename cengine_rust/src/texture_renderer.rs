@@ -41,7 +41,6 @@ impl TextureRenderer {
             let texture = c::create_texture();
             let vao = c::create_vao();
             let vbo = c::create_vbo();
-            c::enable_transparency();
             c::bind_vao(vao);
             c::bind_vbo(vbo);
             c::vertex_attrib_pointer_float(0, 2, 4 * 4, 0);
@@ -73,7 +72,7 @@ impl TextureRenderer {
                 -1.0,
                 1.0,
             );
-            set_matrix(self.program, "view", view.to_f32_ptr());
+            set_matrix4(self.program, "view", view.to_f32_ptr());
             c::draw_triangle_arrays(self.vertex_count);
             self.clear_vertices();
         }
@@ -82,6 +81,7 @@ impl TextureRenderer {
     pub fn update_texture(&mut self, texture: &Texture) {
         let ptr = texture.data.as_ptr();
         unsafe {
+            c::bind_texture(self.texture);
             c::tex_image_2d(ptr, texture.width, texture.height, texture.channels);
         }
     }

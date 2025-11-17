@@ -1,5 +1,5 @@
 use crate::c;
-use math::*;
+use math::{vec3::*, *};
 use std::ffi::CString;
 
 pub fn update_vertices_static(vertices: &Vec<f32>) {
@@ -22,10 +22,17 @@ pub fn get_cstring(str: &str) -> CString {
     return CString::new(str).unwrap();
 }
 
-pub fn set_matrix(program: u32, name: &str, ptr: *const f32) {
+pub fn set_matrix4(program: u32, name: &str, ptr: *const f32) {
     let a = get_cstring(name);
     unsafe {
-        c::set_matrix(program, a.as_ptr(), ptr);
+        c::set_matrix4(program, a.as_ptr(), ptr);
+    }
+}
+
+pub fn set_vector3(program: u32, name: &str, v: &Vec3) {
+    let a = get_cstring(name);
+    unsafe {
+        c::set_vector3(program, a.as_ptr(), v.x, v.y, v.z);
     }
 }
 
@@ -60,9 +67,15 @@ pub fn create_font_data(
     }
 }
 
-pub fn add_vector2(vertices: &mut Vec<f32>, x: f32, y: f32) {
-    vertices.push(x);
-    vertices.push(y);
+pub fn add_vector2(vertices: &mut Vec<f32>, v: &Vec2) {
+    vertices.push(v.x);
+    vertices.push(v.y);
+}
+
+pub fn add_vector3(vertices: &mut Vec<f32>, v: &Vec3) {
+    vertices.push(v.x);
+    vertices.push(v.y);
+    vertices.push(v.z);
 }
 
 pub fn add_color(vertices: &mut Vec<f32>, c: &Color) {

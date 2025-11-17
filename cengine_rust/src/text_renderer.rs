@@ -54,7 +54,6 @@ impl TextRenderer {
             c::tex_image_2d(fontdata.atlas_bitmap, atlas_size, atlas_size, 1);
             let vao = c::create_vao();
             let vbo = c::create_vbo();
-            c::enable_transparency();
             c::bind_vao(vao);
             c::bind_vbo(vbo);
             c::vertex_attrib_pointer_float(0, 2, 8 * 4, 0);
@@ -90,7 +89,7 @@ impl TextRenderer {
                 -1.0,
                 1.0,
             );
-            set_matrix(self.program, "view", view.to_f32_ptr());
+            set_matrix4(self.program, "view", view.to_f32_ptr());
             c::draw_triangle_arrays(self.vertex_count);
             self.clear_vertices();
         }
@@ -101,87 +100,61 @@ impl TextRenderer {
         self.vertex_count = 0;
     }
 
-    pub fn draw_triangle(&mut self, triangle: &Triangle2, color: &Color) {
+    pub fn draw_triangle(&mut self, pos: &Triangle2, uv: &Triangle2, color: &Color) {
         let vertices = &mut self.vertices;
-        let uv = (self.atlas_size as f32 - 0.5) / self.atlas_size as f32;
         self.vertex_count += 3;
-        add_vector2(vertices, triangle.a.x, triangle.a.y);
-        add_vector2(vertices, uv, uv);
+        add_vector2(vertices, &pos.a);
+        add_vector2(vertices, &uv.a);
         add_color(vertices, color);
 
-        add_vector2(vertices, triangle.b.x, triangle.b.y);
-        add_vector2(vertices, uv, uv);
+        add_vector2(vertices, &pos.b);
+        add_vector2(vertices, &uv.b);
         add_color(vertices, color);
 
-        add_vector2(vertices, triangle.c.x, triangle.c.y);
-        add_vector2(vertices, uv, uv);
+        add_vector2(vertices, &pos.c);
+        add_vector2(vertices, &uv.c);
         add_color(vertices, color);
     }
 
     pub fn draw_rect(&mut self, rect: &Rect, color: &Color) {
-        self.draw_triangle(&rect.tri1(), color);
-        self.draw_triangle(&rect.tri2(), color);
+        let uv = (self.atlas_size as f32 - 0.5) / self.atlas_size as f32;
+        let uv_pos = Vec2 { x: uv, y: uv };
+        let uv_tri = Triangle2 {
+            a: uv_pos.clone(),
+            b: uv_pos.clone(),
+            c: uv_pos.clone(),
+        };
+        self.draw_triangle(&rect.tri1(), &uv_tri, color);
+        self.draw_triangle(&rect.tri2(), &uv_tri, color);
+    }
+
+    pub fn draw_rect_uv(&mut self, pos: &Rect, uv: &Rect, color: &Color) {
+        self.draw_triangle(&pos.tri1(), &uv.tri1(), color);
+        self.draw_triangle(&pos.tri2(), &uv.tri2(), color);
     }
 
     pub fn draw_char(&mut self, x: f32, y: f32, c: char, font_height: f32, color: &Color) -> f32 {
-        return match get_baked(&self.fontdata, c) {
+        let fontdata = get_baked(&self.fontdata, c);
+        return match fontdata {
             Some(baked) => {
                 let fontscale = font_height / self.font_height;
-                let px = x + baked.xoff * fontscale;
-                let py = y + baked.yoff * fontscale + font_height;
-                let pw = (baked.x1 - baked.x0) as f32 * fontscale;
-                let ph = (baked.y1 - baked.y0) as f32 * fontscale;
-
-                let vertices = &mut self.vertices;
-                self.vertex_count += 6;
-                add_vector2(vertices, px, py);
-                add_vector2(
-                    vertices,
-                    baked.x0 as f32 / self.atlas_size as f32,
-                    baked.y0 as f32 / self.atlas_size as f32,
-                );
-                add_color(vertices, color);
-
-                add_vector2(vertices, px + pw, py);
-                add_vector2(
-                    vertices,
-                    baked.x1 as f32 / self.atlas_size as f32,
-                    baked.y0 as f32 / self.atlas_size as f32,
-                );
-                add_color(vertices, color);
-
-                add_vector2(vertices, px + pw, py + ph);
-                add_vector2(
-                    vertices,
-                    baked.x1 as f32 / self.atlas_size as f32,
-                    baked.y1 as f32 / self.atlas_size as f32,
-                );
-                add_color(vertices, color);
-
-                add_vector2(vertices, px, py);
-                add_vector2(
-                    vertices,
-                    baked.x0 as f32 / self.atlas_size as f32,
-                    baked.y0 as f32 / self.atlas_size as f32,
-                );
-                add_color(vertices, color);
-
-                add_vector2(vertices, px + pw, py + ph);
-                add_vector2(
-                    vertices,
-                    baked.x1 as f32 / self.atlas_size as f32,
-                    baked.y1 as f32 / self.atlas_size as f32,
-                );
-                add_color(vertices, color);
-
-                add_vector2(vertices, px, py + ph);
-                add_vector2(
-                    vertices,
-                    baked.x0 as f32 / self.atlas_size as f32,
-                    baked.y1 as f32 / self.atlas_size as f32,
-                );
-                add_color(vertices, color);
-                baked.xadvance * fontscale
+                let bw = (baked.x1 - baked.x0) as f32;
+                let bh = (baked.y1 - baked.y0) as f32;
+                let prect = Rect {
+                    x: x + baked.xoff as f32 * fontscale,
+                    y: y + baked.yoff as f32 * fontscale + font_height,
+                    w: bw * fontscale,
+                    h: bh * fontscale,
+                };
+                let uvrect = Rect {
+                    x: baked.x0 as f32 / self.atlas_size as f32,
+                    y: baked.y0 as f32 / self.atlas_size as f32,
+                    w: bw / self.atlas_size as f32,
+                    h: bh / self.atlas_size as f32,
+                };
+                let advance = baked.xadvance * fontscale;
+                self.draw_rect_uv(&prect, &uvrect, color);
+                advance
             }
             None => 0.0,
         };

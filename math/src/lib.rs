@@ -1,5 +1,16 @@
 use std::ops::{Add, Mul, Neg, Sub};
 
+#[repr(C)]
+pub struct Vec2i {
+    pub x: i32,
+    pub y: i32,
+}
+
+pub struct Vec2 {
+    pub x: f32,
+    pub y: f32,
+}
+
 pub struct Color {
     pub r: f32,
     pub g: f32,

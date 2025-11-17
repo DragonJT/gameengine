@@ -85,17 +85,24 @@ unsigned int create_texture(uint8_t* ptr, int width, int height, int nrChannels)
     return texture;
 }
 
-void render(unsigned int num_vertices)
-{
-    int screenWidth, screenHeight;
-    glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
-    glViewport(0, 0, screenWidth, screenHeight);
+void viewport(int x, int y, int w, int h){
+    glViewport(x,y,w,h);
+}
+
+void clear_color_buffer_bit(float r, float g, float b, float a){
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+}
 
+void draw_triangle_arrays(unsigned int num_vertices){
     glDrawArrays(GL_TRIANGLES, 0, num_vertices);
+}
 
+void swap_buffers(){
     glfwSwapBuffers(window);
+}
+
+void poll_events(){
     glfwPollEvents();
 }
 
@@ -232,13 +239,13 @@ void terminate(){
     glfwTerminate();
 }
 
-struct WindowSize{
+struct Vec2i{
     int x;
     int y;
 };
 
-struct WindowSize get_window_size(){
-    struct WindowSize window_size;
+struct Vec2i get_window_size(){
+    struct Vec2i window_size;
     glfwGetFramebufferSize(window, &window_size.x, &window_size.y);
     return window_size;
 }

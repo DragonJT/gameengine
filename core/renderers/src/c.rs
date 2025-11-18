@@ -18,6 +18,7 @@ pub struct FontData {
 }
 
 unsafe extern "C" {
+    pub fn is_key_pressed(key: i32) -> u8;
     pub fn initialize(screen_width: i32, screen_height: i32);
     pub fn initialize_program(vertex_souce: *const c_char, fragment_source: *const c_char) -> u32;
     pub fn create_vao() -> u32;

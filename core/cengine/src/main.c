@@ -5,8 +5,26 @@
 #include <stdlib.h>
 #define STB_TRUETYPE_IMPLEMENTATION  // force following include to generate implementation
 #include "stb_truetype.h"
+#define NUM_KEYS 349
 
 GLFWwindow* window;
+
+uint8_t keys_pressed[NUM_KEYS];
+
+uint8_t is_key_pressed(int keycode){
+    return keys_pressed[keycode];
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if(key<NUM_KEYS){
+        if(action == GLFW_PRESS){
+            keys_pressed[key] = 1;
+        }
+        if(action == GLFW_RELEASE){
+            keys_pressed[key] = 0;
+        }
+    }
+}
 
 unsigned char *load_file(const char *path, size_t *out_size) {
     FILE *f = fopen(path, "rb");
@@ -149,6 +167,11 @@ void initialize(int screenWidth, int screenHeight)
         printf("Failed to initialize GLAD");
         return;
     }
+
+    for(int i = 0; i < NUM_KEYS; i++){
+        keys_pressed[i] = 0;
+    }
+    glfwSetKeyCallback(window, key_callback);
 }
 
 unsigned int createShader(const char* source, int shaderType)

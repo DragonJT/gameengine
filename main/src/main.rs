@@ -35,6 +35,8 @@ fn main() {
         c: Vec2::new(0.0, 0.5),
     };
     basic_lighting.draw_triangle(pos, normal, uv);
+    let mut texture = Texture::new(1, 1, 4);
+    texture.set_pixel(0, 0, &[255, 0, 0, 255]);
     basic_lighting.update_texture(&texture);
 
     while !window_should_close() {
@@ -43,7 +45,19 @@ fn main() {
         viewport(0, 0, window_size.x, window_size.y);
         clear_color_buffer_bit(1.0, 1.0, 1.0, 1.0);
 
-        orbit_camera.rotate(0.01, 0.0);
+        let rotate_speed = 0.2;
+        if is_key_pressed(Key::Left) {
+            orbit_camera.rotate(rotate_speed, 0.0);
+        }
+        if is_key_pressed(Key::Right) {
+            orbit_camera.rotate(-rotate_speed, 0.0);
+        }
+        if is_key_pressed(Key::Up) {
+            orbit_camera.rotate(0.0, -rotate_speed);
+        }
+        if is_key_pressed(Key::Down) {
+            orbit_camera.rotate(0.0, rotate_speed);
+        }
         let model = Mat4::IDENTITY;
         let view = orbit_camera.view_matrix();
         let projection =

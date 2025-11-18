@@ -129,6 +129,19 @@ impl TextRenderer {
         self.draw_triangle(&rect.tri2(), &uv_tri, color);
     }
 
+    pub fn draw_rect_outline(&mut self, rect: &Rect, color: &Color, width: f32) {
+        self.draw_rect(&Rect::new(rect.x, rect.y, rect.w, width), color);
+        self.draw_rect(&Rect::new(rect.x, rect.y, width, rect.h), color);
+        self.draw_rect(
+            &Rect::new(rect.x, rect.y + rect.h - width, rect.w, width),
+            color,
+        );
+        self.draw_rect(
+            &Rect::new(rect.x + rect.w - width, rect.y, width, rect.h),
+            color,
+        );
+    }
+
     pub fn draw_rect_uv(&mut self, pos: &Rect, uv: &Rect, color: &Color) {
         self.draw_triangle(&pos.tri1(), &uv.tri1(), color);
         self.draw_triangle(&pos.tri2(), &uv.tri2(), color);

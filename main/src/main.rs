@@ -1,99 +1,55 @@
-use cameras::orbit_camera::*;
-use math::{mat4::*, quat::Quat, texture::*, vec3::*, *};
-use renderers::{
-    lit_renderer::*, simple_mesh::SimpleMesh, text_renderer::*, texture_renderer::*, *,
-};
+use math::*;
+use renderers::{text_renderer::*, *};
+use ui::{widget::*, *};
 
 fn main() {
     initialize(2000, 1600);
     cull_back_faces();
     enable_transparency();
 
-    let mut text_renderer = TextRenderer::new("assets/JetBrainsMono-Medium.ttf", 75.0, 512);
-
-    let mut texture_renderer = TextureRenderer::new();
-    let mut texture = Texture::new(100, 100, 4);
-    texture.draw_circle(50, 50, 50, &[0, 0, 255, 255]);
-    texture_renderer.update_texture(&texture);
-
-    let mut orbit_camera = OrbitCamera::new(Vec3::new(0.0, 0.0, 0.0), 5.0, 0.9, 0.1, 100.0);
-    let mut basic_lighting = LitRenderer::new();
-    let mut cube = SimpleMesh::new();
-    cube.add_cube(Mat4::IDENTITY);
-    cube.add_cube(Mat4::trs(
-        Vec3::new(0.0, 1.0, 0.0),
-        Quat::IDENTITY,
-        Vec3::new(0.5, 0.5, 0.5),
-    ));
-    cube.add_line(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 5.0, 0.0), 0.3);
-    basic_lighting.draw_simple_mesh(&cube, Vec2::new(0.5, 0.5));
-    let mut texture = Texture::new(1, 1, 4);
-    texture.set_pixel(0, 0, &[255, 0, 0, 255]);
-    basic_lighting.update_texture(&texture);
+    let fontheight = 40.0;
+    let mut text_renderer = TextRenderer::new("assets/JetBrainsMono-Medium.ttf", fontheight, 512);
+    let mut ui = Widget::screen(Color::green());
 
     while !window_should_close() {
         let window_size = get_window_size();
         poll_events();
         viewport(0, 0, window_size.x, window_size.y);
         clear_color(1.0, 1.0, 1.0, 1.0);
-        clear(BufferBits::DepthAndColor);
+        clear(BufferBits::Color);
 
-        let rotate_speed = 0.2;
-        if is_key_pressed(Key::Left) {
-            orbit_camera.rotate(rotate_speed, 0.0);
+        if is_mouse_down(MouseButton::Left) {
+            ui.text_panel(
+                "node".to_string(),
+                Rect::from_vec2s(get_mouse_position(), Vec2::new(400.0, 250.0)),
+            );
         }
-        if is_key_pressed(Key::Right) {
-            orbit_camera.rotate(-rotate_speed, 0.0);
-        }
-        if is_key_pressed(Key::Up) {
-            orbit_camera.rotate(0.0, -rotate_speed);
-        }
-        if is_key_pressed(Key::Down) {
-            orbit_camera.rotate(0.0, rotate_speed);
-        }
-        let model = Mat4::IDENTITY;
-        let view = orbit_camera.view_matrix();
-        let projection =
-            orbit_camera.projection_matrix(window_size.x as f32 / window_size.y as f32);
-        let light_pos = Vec3 {
-            x: 3.0,
-            y: 3.0,
-            z: 3.0,
-        };
-        let light_color = Color::white();
-        basic_lighting.render(
-            &model,
-            &view,
-            &projection,
-            &orbit_camera.position(),
-            &light_pos,
-            &light_color,
-        );
+        let drawables = ui.draw(&Rect::new(
+            0.0,
+            0.0,
+            window_size.x as f32,
+            window_size.y as f32,
+        ));
 
-        text_renderer.draw_rect(
-            &Rect {
-                x: 100.0,
-                y: 100.0,
-                w: 500.0,
-                h: 500.0,
-            },
-            &Color::red(),
-        );
-        text_renderer.draw_text(
-            &Vec2 { x: 100.0, y: 100.0 },
-            "HelloWorld",
-            300.0,
-            &Color::white(),
-        );
+        for d in drawables {
+            match d {
+                DrawType::DrawRect(drawrect) => match (drawrect.outline) {
+                    Some(w) => text_renderer.draw_rect_outline(&drawrect.rect, &drawrect.color, w),
+                    None => text_renderer.draw_rect(&drawrect.rect, &drawrect.color),
+                },
+                DrawType::DrawText(drawtext) => {
+                    text_renderer.draw_text(
+                        &drawtext.position,
+                        &drawtext.text,
+                        drawtext.fontscale * fontheight,
+                        &drawtext.color,
+                    );
+                }
+                _ => {}
+            }
+        }
         text_renderer.render();
 
-        texture_renderer.draw_full_texture(&Rect {
-            x: 400.0,
-            y: 400.0,
-            w: 400.0,
-            h: 400.0,
-        });
-        texture_renderer.render();
         swap_buffers();
     }
 }

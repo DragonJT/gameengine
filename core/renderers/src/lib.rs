@@ -15,6 +15,13 @@ pub enum BufferBits {
 }
 
 #[repr(i32)]
+pub enum MouseButton {
+    Left = 0,
+    Right = 1,
+    Middle = 2,
+}
+
+#[repr(i32)]
 pub enum Key {
     // --- Printable keys ---
     Space = 32,
@@ -136,9 +143,45 @@ pub enum Key {
     Menu = 348,
 }
 
+pub fn is_key_down(key: Key) -> bool {
+    unsafe {
+        return c::is_key_down(key as i32) != 0;
+    }
+}
+
+pub fn is_key_up(key: i32) -> bool {
+    unsafe {
+        return c::is_key_up(key as i32) != 0;
+    }
+}
+
+pub fn is_mouse_down(button: MouseButton) -> bool {
+    unsafe {
+        return c::is_mouse_down(button as i32) != 0;
+    }
+}
+
+pub fn is_mouse_up(button: MouseButton) -> bool {
+    unsafe {
+        return c::is_mouse_up(button as i32) != 0;
+    }
+}
+
 pub fn is_key_pressed(key: Key) -> bool {
     unsafe {
         return c::is_key_pressed(key as i32) != 0;
+    }
+}
+
+pub fn is_mouse_pressed(button: MouseButton) -> bool {
+    unsafe {
+        return c::is_mouse_pressed(button as i32) != 0;
+    }
+}
+
+pub fn get_mouse_position() -> Vec2 {
+    unsafe {
+        return c::get_mouse_position();
     }
 }
 
@@ -151,7 +194,6 @@ pub fn window_should_close() -> bool {
 pub fn initialize(screen_width: i32, screen_height: i32) {
     unsafe {
         c::initialize(screen_width, screen_height);
-        //c::cull_back_faces();
     }
 }
 

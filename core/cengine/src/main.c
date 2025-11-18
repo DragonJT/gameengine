@@ -5,25 +5,71 @@
 #include <stdlib.h>
 #define STB_TRUETYPE_IMPLEMENTATION  // force following include to generate implementation
 #include "stb_truetype.h"
-#define NUM_KEYS 349
-
 GLFWwindow* window;
+int keydown;
+int keyup;
+int mousedown;
+int mouseup;
 
-uint8_t keys_pressed[NUM_KEYS];
+struct Vec2i{
+    int x;
+    int y;
+};
 
-uint8_t is_key_pressed(int keycode){
-    return keys_pressed[keycode];
+struct Vec2{
+    float x;
+    float y;
+};
+
+int is_key_pressed(int keycode){
+    return glfwGetKey(window, keycode);
+}
+
+int is_mouse_pressed(int button){
+    return glfwGetMouseButton(window, button);
+}
+
+int is_key_down(int key){
+    return keydown == key;
+}
+
+int is_key_up(int key){
+    return keyup == key;
+}
+
+int is_mouse_down(int button){
+    return mousedown == button;
+}
+
+int is_mouse_up(int button){
+    return mouseup == button;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
-    if(key<NUM_KEYS){
-        if(action == GLFW_PRESS){
-            keys_pressed[key] = 1;
-        }
-        if(action == GLFW_RELEASE){
-            keys_pressed[key] = 0;
-        }
+    if(action == GLFW_PRESS){
+        keydown = key;
     }
+    else if(action == GLFW_RELEASE){
+        keyup = key;
+    }
+}
+
+void mouse_callback(GLFWwindow* window, int button, int action, int mods){
+    if(action == GLFW_PRESS){
+        mousedown = button;
+    }
+    else if(action == GLFW_RELEASE){
+        mouseup = button;
+    }
+}
+
+struct Vec2 get_mouse_position(){
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    struct Vec2 v;
+    v.x = xpos;
+    v.y = ypos;
+    return v;
 }
 
 void enable_depth_test(){
@@ -149,6 +195,10 @@ void swap_buffers(){
 }
 
 void poll_events(){
+    keydown = -1;
+    keyup = -1;
+    mousedown = -1;
+    mouseup = -1;
     glfwPollEvents();
 }
 
@@ -184,10 +234,8 @@ void initialize(int screenWidth, int screenHeight)
         return;
     }
 
-    for(int i = 0; i < NUM_KEYS; i++){
-        keys_pressed[i] = 0;
-    }
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_callback);
 }
 
 unsigned int createShader(const char* source, int shaderType)
@@ -294,11 +342,6 @@ void enable_transparency(){
 void terminate(){
     glfwTerminate();
 }
-
-struct Vec2i{
-    int x;
-    int y;
-};
 
 struct Vec2i get_window_size(){
     struct Vec2i window_size;

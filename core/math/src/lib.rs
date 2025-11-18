@@ -30,7 +30,8 @@ pub struct Vec2i {
     pub y: i32,
 }
 
-#[derive(Clone)]
+#[repr(C)]
+#[derive(Clone, Debug)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
@@ -42,6 +43,7 @@ impl Vec2 {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct Rect {
     pub x: f32,
     pub y: f32,
@@ -50,6 +52,26 @@ pub struct Rect {
 }
 
 impl Rect {
+    pub fn new(x: f32, y: f32, w: f32, h: f32) -> Self {
+        Rect { x, y, w, h }
+    }
+
+    pub fn from_vec2s(pos: Vec2, size: Vec2) -> Self {
+        Rect {
+            x: pos.x,
+            y: pos.y,
+            w: size.x,
+            h: size.y,
+        }
+    }
+
+    pub fn topleft(&self) -> Vec2 {
+        Vec2 {
+            x: self.x,
+            y: self.y,
+        }
+    }
+
     pub fn a(&self) -> Vec2 {
         Vec2 {
             x: self.x,
@@ -95,6 +117,7 @@ impl Rect {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct Color {
     pub r: f32,
     pub g: f32,
@@ -107,6 +130,9 @@ impl Color {
         Color { r, g, b, a }
     }
 
+    pub fn black() -> Color {
+        Color::new(0.0, 0.0, 0.0, 1.0)
+    }
     pub fn blue() -> Color {
         Color::new(0.0, 0.0, 1.0, 1.0)
     }

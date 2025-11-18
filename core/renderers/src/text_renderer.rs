@@ -76,6 +76,7 @@ impl TextRenderer {
     pub fn render(&mut self) {
         unsafe {
             c::bind_program(self.program);
+            c::disable_depth_test();
             c::bind_vao(self.vao);
             c::bind_vbo(self.vbo);
             update_vertices_dynamic(&self.vertices);
@@ -107,12 +108,12 @@ impl TextRenderer {
         add_vector2(vertices, &uv.a);
         add_color(vertices, color);
 
-        add_vector2(vertices, &pos.b);
-        add_vector2(vertices, &uv.b);
-        add_color(vertices, color);
-
         add_vector2(vertices, &pos.c);
         add_vector2(vertices, &uv.c);
+        add_color(vertices, color);
+
+        add_vector2(vertices, &pos.b);
+        add_vector2(vertices, &uv.b);
         add_color(vertices, color);
     }
 

@@ -59,6 +59,7 @@ impl TextureRenderer {
     pub fn render(&mut self) {
         unsafe {
             c::bind_program(self.program);
+            c::disable_depth_test();
             c::bind_vao(self.vao);
             c::bind_vbo(self.vbo);
             update_vertices_dynamic(&self.vertices);
@@ -98,15 +99,15 @@ impl TextureRenderer {
         self.vertices.push(uv.a.x);
         self.vertices.push(uv.a.y);
 
-        self.vertices.push(t.b.x);
-        self.vertices.push(t.b.y);
-        self.vertices.push(uv.b.x);
-        self.vertices.push(uv.b.y);
-
         self.vertices.push(t.c.x);
         self.vertices.push(t.c.y);
         self.vertices.push(uv.c.x);
         self.vertices.push(uv.c.y);
+
+        self.vertices.push(t.b.x);
+        self.vertices.push(t.b.y);
+        self.vertices.push(uv.b.x);
+        self.vertices.push(uv.b.y);
     }
 
     pub fn draw_texture(&mut self, rect: &Rect, uv: &Rect) {

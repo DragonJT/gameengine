@@ -1,5 +1,6 @@
 use crate::c;
 use crate::helper_functions::*;
+use crate::simple_mesh::SimpleMesh;
 use math::{mat4::*, texture::*, vec3::*, *};
 
 pub struct LitRenderer {
@@ -103,6 +104,7 @@ impl LitRenderer {
     ) {
         unsafe {
             c::bind_program(self.program);
+            c::enable_depth_test();
             c::bind_vao(self.vao);
             c::bind_vbo(self.vbo);
             update_vertices_dynamic(&self.vertices);
@@ -117,7 +119,7 @@ impl LitRenderer {
         }
     }
 
-    pub fn draw_triangle(&mut self, pos: Triangle3, normal: Triangle3, uv: Triangle2) {
+    pub fn draw_triangle(&mut self, pos: &Triangle3, normal: &Triangle3, uv: &Triangle2) {
         let vertices = &mut self.vertices;
         self.vertex_count += 3;
         add_vector3(vertices, &pos.a);
@@ -131,6 +133,23 @@ impl LitRenderer {
         add_vector3(vertices, &pos.c);
         add_vector3(vertices, &normal.c);
         add_vector2(vertices, &uv.c);
+    }
+
+    pub fn draw_simple_mesh(&mut self, simple_mesh: &SimpleMesh, uv: Vec2) {
+        let uv_tri = Triangle2 {
+            a: uv.clone(),
+            b: uv.clone(),
+            c: uv.clone(),
+        };
+        for t in &simple_mesh.triangles {
+            let normal = t.normal();
+            let normal_tri = Triangle3 {
+                a: normal.clone(),
+                b: normal.clone(),
+                c: normal.clone(),
+            };
+            self.draw_triangle(&t, &normal_tri, &uv_tri);
+        }
     }
 
     pub fn update_texture(&mut self, texture: &Texture) {

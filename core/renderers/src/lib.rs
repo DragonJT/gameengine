@@ -2,8 +2,17 @@ use math::*;
 mod c;
 mod helper_functions;
 pub mod lit_renderer;
+pub mod simple_mesh;
 pub mod text_renderer;
 pub mod texture_renderer;
+
+#[repr(i32)]
+pub enum BufferBits {
+    Depth = 0x00000100,
+    Stencil = 0x00000400,
+    Color = 0x00004000,
+    DepthAndColor = BufferBits::Depth as i32 | BufferBits::Color as i32,
+}
 
 #[repr(i32)]
 pub enum Key {
@@ -142,6 +151,7 @@ pub fn window_should_close() -> bool {
 pub fn initialize(screen_width: i32, screen_height: i32) {
     unsafe {
         c::initialize(screen_width, screen_height);
+        //c::cull_back_faces();
     }
 }
 
@@ -161,9 +171,15 @@ pub fn viewport(x: i32, y: i32, w: i32, h: i32) {
     }
 }
 
-pub fn clear_color_buffer_bit(r: f32, g: f32, b: f32, a: f32) {
+pub fn clear(bits: BufferBits) {
     unsafe {
-        c::clear_color_buffer_bit(r, g, b, a);
+        c::clear(bits as i32);
+    }
+}
+
+pub fn clear_color(r: f32, g: f32, b: f32, a: f32) {
+    unsafe {
+        c::clear_color(r, g, b, a);
     }
 }
 
@@ -176,5 +192,11 @@ pub fn swap_buffers() {
 pub fn enable_transparency() {
     unsafe {
         c::enable_transparency();
+    }
+}
+
+pub fn cull_back_faces() {
+    unsafe {
+        c::cull_back_faces();
     }
 }

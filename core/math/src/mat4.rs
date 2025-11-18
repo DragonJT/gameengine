@@ -1,4 +1,4 @@
-use crate::vec3::*;
+use crate::{quat::*, vec3::*};
 use std::ops::Mul;
 
 /// 4×4 matrix in row-major order.
@@ -56,8 +56,8 @@ impl Mat4 {
     }
 
     pub fn look_at(eye: Vec3, target: Vec3, up: Vec3) -> Self {
-        let f = (target - eye).normalized(); // forward
-        let s = f.cross(up).normalized(); // right
+        let f = (target - eye).normalize(); // forward
+        let s = f.cross(up).normalize(); // right
         let u = s.cross(f); // recalculated up
 
         Mat4 {
@@ -100,6 +100,9 @@ impl Mat4 {
         )
     }
 
+    pub fn trs(t: Vec3, r: Quat, s: Vec3) -> Mat4 {
+        Mat4::translate(t) * r.to_mat4() * Mat4::scale(s)
+    }
     /// Transform a Vec3 as a position (Vec3 augmented with w=1).
     pub fn transform_point3(self, v: Vec3) -> Vec3 {
         let x = self.m[0] * v.x + self.m[1] * v.y + self.m[2] * v.z + self.m[3];

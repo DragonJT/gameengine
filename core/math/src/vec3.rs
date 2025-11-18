@@ -54,7 +54,7 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn normalized(self) -> Vec3 {
+    pub fn normalize(self) -> Vec3 {
         let len = self.length();
         if len == 0.0 { self } else { self / len }
     }

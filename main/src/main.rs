@@ -1,10 +1,14 @@
 use cameras::orbit_camera::*;
-use math::{mat4::*, texture::*, vec3::*, *};
-use renderers::{lit_renderer::*, text_renderer::*, texture_renderer::*, *};
+use math::{mat4::*, quat::Quat, texture::*, vec3::*, *};
+use renderers::{
+    lit_renderer::*, simple_mesh::SimpleMesh, text_renderer::*, texture_renderer::*, *,
+};
 
 fn main() {
     initialize(2000, 1600);
+    cull_back_faces();
     enable_transparency();
+
     let mut text_renderer = TextRenderer::new("assets/JetBrainsMono-Medium.ttf", 75.0, 512);
 
     let mut texture_renderer = TextureRenderer::new();
@@ -14,27 +18,14 @@ fn main() {
 
     let mut orbit_camera = OrbitCamera::new(Vec3::new(0.0, 0.0, 0.0), 5.0, 0.9, 0.1, 100.0);
     let mut basic_lighting = LitRenderer::new();
-    let pos = Triangle3 {
-        a: Vec3::new(-0.5, -0.5, 0.0),
-        b: Vec3::new(0.5, -0.5, 0.0),
-        c: Vec3::new(0.0, 0.5, 0.0),
-    };
-    let normalv = Vec3 {
-        x: 0.0,
-        y: 0.0,
-        z: 1.0,
-    };
-    let normal = Triangle3 {
-        a: normalv.clone(),
-        b: normalv.clone(),
-        c: normalv.clone(),
-    };
-    let uv = Triangle2 {
-        a: Vec2::new(-0.5, -0.5),
-        b: Vec2::new(0.5, -0.5),
-        c: Vec2::new(0.0, 0.5),
-    };
-    basic_lighting.draw_triangle(pos, normal, uv);
+    let mut cube = SimpleMesh::new();
+    cube.add_cube(Mat4::IDENTITY);
+    cube.add_cube(Mat4::trs(
+        Vec3::new(0.0, 1.0, 0.0),
+        Quat::IDENTITY,
+        Vec3::new(0.5, 0.5, 0.5),
+    ));
+    basic_lighting.draw_simple_mesh(&cube, Vec2::new(0.5, 0.5));
     let mut texture = Texture::new(1, 1, 4);
     texture.set_pixel(0, 0, &[255, 0, 0, 255]);
     basic_lighting.update_texture(&texture);
@@ -43,7 +34,8 @@ fn main() {
         let window_size = get_window_size();
         poll_events();
         viewport(0, 0, window_size.x, window_size.y);
-        clear_color_buffer_bit(1.0, 1.0, 1.0, 1.0);
+        clear_color(1.0, 1.0, 1.0, 1.0);
+        clear(BufferBits::DepthAndColor);
 
         let rotate_speed = 0.2;
         if is_key_pressed(Key::Left) {

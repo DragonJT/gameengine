@@ -16,6 +16,14 @@ pub struct Triangle3 {
     pub c: Vec3,
 }
 
+impl Triangle3 {
+    pub fn normal(&self) -> Vec3 {
+        let edge1 = self.b - self.a;
+        let edge2 = self.c - self.a;
+        Vec3::normalize(Vec3::cross(edge1, edge2))
+    }
+}
+
 #[repr(C)]
 pub struct Vec2i {
     pub x: i32,

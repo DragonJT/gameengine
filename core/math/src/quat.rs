@@ -28,7 +28,7 @@ impl Quat {
     pub fn from_axis_angle(axis: Vec3, angle_rad: f32) -> Self {
         let half = angle_rad * 0.5;
         let (s, c) = half.sin_cos();
-        let axis = axis.normalized();
+        let axis = axis.normalize();
         Quat {
             w: c,
             x: axis.x * s,

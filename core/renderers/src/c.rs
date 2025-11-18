@@ -19,6 +19,9 @@ pub struct FontData {
 
 unsafe extern "C" {
     pub fn is_key_pressed(key: i32) -> u8;
+    pub fn enable_depth_test();
+    pub fn disable_depth_test();
+    pub fn cull_back_faces();
     pub fn initialize(screen_width: i32, screen_height: i32);
     pub fn initialize_program(vertex_souce: *const c_char, fragment_source: *const c_char) -> u32;
     pub fn create_vao() -> u32;
@@ -36,7 +39,8 @@ unsafe extern "C" {
         atlas_height: i32,
     ) -> FontData;
     pub fn viewport(x: i32, y: i32, w: i32, h: i32);
-    pub fn clear_color_buffer_bit(r: f32, g: f32, b: f32, a: f32);
+    pub fn clear(bits: i32);
+    pub fn clear_color(r: f32, g: f32, b: f32, a: f32);
     pub fn draw_triangle_arrays(num_vertices: u32);
     pub fn swap_buffers();
     pub fn poll_events();

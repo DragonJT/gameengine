@@ -26,6 +26,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+void enable_depth_test(){
+    glEnable(GL_DEPTH_TEST);
+}
+
+void disable_depth_test(){
+    glDisable(GL_DEPTH_TEST);
+}
+
+void cull_back_faces(){
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+}
+
 unsigned char *load_file(const char *path, size_t *out_size) {
     FILE *f = fopen(path, "rb");
     if (!f) return NULL;
@@ -119,9 +132,12 @@ void viewport(int x, int y, int w, int h){
     glViewport(x,y,w,h);
 }
 
-void clear_color_buffer_bit(float r, float g, float b, float a){
+void clear_color(float r, float g, float b, float a){
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void clear(int bits){
+    glClear(bits);
 }
 
 void draw_triangle_arrays(unsigned int num_vertices){

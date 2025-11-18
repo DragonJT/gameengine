@@ -1,2 +1,2 @@
 [workspace]
-members = ["cengine_rust", "math", "main"]
+members = ["core/renderers", "core/math", "core/cameras", "main"]

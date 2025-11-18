@@ -1,5 +1,6 @@
-use cengine_rust::{basic_lighting::*, text_renderer::*, texture_renderer::*, *};
+use cameras::orbit_camera::*;
 use math::{mat4::*, texture::*, vec3::*, *};
+use renderers::{lit_renderer::*, text_renderer::*, texture_renderer::*, *};
 
 fn main() {
     initialize(2000, 1600);
@@ -11,7 +12,8 @@ fn main() {
     texture.draw_circle(50, 50, 50, &[0, 0, 255, 255]);
     texture_renderer.update_texture(&texture);
 
-    let mut basic_lighting = BasicLighting::new();
+    let mut orbit_camera = OrbitCamera::new(Vec3::new(0.0, 0.0, 0.0), 5.0, 0.9, 0.1, 100.0);
+    let mut basic_lighting = LitRenderer::new();
     let pos = Triangle3 {
         a: Vec3::new(-0.5, -0.5, 0.0),
         b: Vec3::new(0.5, -0.5, 0.0),
@@ -41,25 +43,11 @@ fn main() {
         viewport(0, 0, window_size.x, window_size.y);
         clear_color_buffer_bit(1.0, 1.0, 1.0, 1.0);
 
-        let view_pos = Vec3 {
-            x: 3.0,
-            y: 3.0,
-            z: 3.0,
-        };
-        let target = Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        };
-        let up = Vec3 {
-            x: 0.0,
-            y: 1.0,
-            z: 0.0,
-        };
+        orbit_camera.rotate(0.01, 0.0);
         let model = Mat4::IDENTITY;
-        let view = Mat4::look_at(view_pos, target, up);
+        let view = orbit_camera.view_matrix();
         let projection =
-            Mat4::perspective(0.7, window_size.x as f32 / window_size.y as f32, 0.1, 10.0);
+            orbit_camera.projection_matrix(window_size.x as f32 / window_size.y as f32);
         let light_pos = Vec3 {
             x: 3.0,
             y: 3.0,
@@ -70,7 +58,7 @@ fn main() {
             &model,
             &view,
             &projection,
-            &view_pos,
+            &orbit_camera.position(),
             &light_pos,
             &light_color,
         );

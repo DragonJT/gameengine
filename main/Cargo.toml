@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-math = {path = "../math" }
-cengine_rust = {path = "../cengine_rust" }
+math = {path = "../core/math" }
+renderers = {path = "../core/renderers" }
+cameras = { path="../core/cameras" }

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  # Exit on error
 
-C_PROJECT_DIR="cengine"
+C_PROJECT_DIR="core/cengine"
 BUILD_DIR="$C_PROJECT_DIR/build"
 EXEC_NAME="cengine"
 

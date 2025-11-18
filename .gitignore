@@ -1,4 +1,4 @@
 target/
 Cargo.lock
-cengine/build/
+core/cengine/build/
 **/.cache/

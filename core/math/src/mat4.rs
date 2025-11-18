@@ -56,8 +56,8 @@ impl Mat4 {
     }
 
     pub fn look_at(eye: Vec3, target: Vec3, up: Vec3) -> Self {
-        let f = (target - eye).normalize(); // forward
-        let s = f.cross(up).normalize(); // right
+        let f = (target - eye).normalized(); // forward
+        let s = f.cross(up).normalized(); // right
         let u = s.cross(f); // recalculated up
 
         Mat4 {

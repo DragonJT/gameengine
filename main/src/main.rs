@@ -25,6 +25,7 @@ fn main() {
         Quat::IDENTITY,
         Vec3::new(0.5, 0.5, 0.5),
     ));
+    cube.add_line(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 5.0, 0.0), 0.3);
     basic_lighting.draw_simple_mesh(&cube, Vec2::new(0.5, 0.5));
     let mut texture = Texture::new(1, 1, 4);
     texture.set_pixel(0, 0, &[255, 0, 0, 255]);

@@ -19,6 +19,67 @@ impl Quat {
         z: 0.0,
     };
 
+    /// Create an orientation so that local +Z points along `forward`
+    /// and local +Y is aligned with `up` as much as possible.
+    pub fn from_forward_up(forward: Vec3, up: Vec3) -> Self {
+        let f = forward.normalized();
+        let r = up.cross(f).normalized(); // right
+        let u = f.cross(r); // corrected up
+
+        // Build a 3x3 rotation matrix from the basis:
+        // columns = right, up, forward
+        let m00 = r.x;
+        let m01 = u.x;
+        let m02 = f.x;
+        let m10 = r.y;
+        let m11 = u.y;
+        let m12 = f.y;
+        let m20 = r.z;
+        let m21 = u.z;
+        let m22 = f.z;
+
+        // Convert rotation matrix to quaternion
+        let trace = m00 + m11 + m22;
+
+        let (w, x, y, z) = if trace > 0.0 {
+            let s = (trace + 1.0).sqrt() * 2.0; // s = 4*w
+            let w = 0.25 * s;
+            let x = (m21 - m12) / s;
+            let y = (m02 - m20) / s;
+            let z = (m10 - m01) / s;
+            (w, x, y, z)
+        } else if m00 > m11 && m00 > m22 {
+            let s = (1.0 + m00 - m11 - m22).sqrt() * 2.0; // s = 4*x
+            let w = (m21 - m12) / s;
+            let x = 0.25 * s;
+            let y = (m01 + m10) / s;
+            let z = (m02 + m20) / s;
+            (w, x, y, z)
+        } else if m11 > m22 {
+            let s = (1.0 + m11 - m00 - m22).sqrt() * 2.0; // s = 4*y
+            let w = (m02 - m20) / s;
+            let x = (m01 + m10) / s;
+            let y = 0.25 * s;
+            let z = (m12 + m21) / s;
+            (w, x, y, z)
+        } else {
+            let s = (1.0 + m22 - m00 - m11).sqrt() * 2.0; // s = 4*z
+            let w = (m10 - m01) / s;
+            let x = (m02 + m20) / s;
+            let y = (m12 + m21) / s;
+            let z = 0.25 * s;
+            (w, x, y, z)
+        };
+
+        Quat { w, x, y, z }.normalized()
+    }
+
+    /// Quaternion that makes the object at `eye` look toward `target`.
+    pub fn look_at(eye: Vec3, target: Vec3, up: Vec3) -> Self {
+        let forward = (target - eye).normalized();
+        Self::from_forward_up(forward, up)
+    }
+
     #[inline]
     pub const fn new(w: f32, x: f32, y: f32, z: f32) -> Self {
         Self { w, x, y, z }
@@ -28,7 +89,7 @@ impl Quat {
     pub fn from_axis_angle(axis: Vec3, angle_rad: f32) -> Self {
         let half = angle_rad * 0.5;
         let (s, c) = half.sin_cos();
-        let axis = axis.normalize();
+        let axis = axis.normalized();
         Quat {
             w: c,
             x: axis.x * s,

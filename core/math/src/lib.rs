@@ -20,7 +20,7 @@ impl Triangle3 {
     pub fn normal(&self) -> Vec3 {
         let edge1 = self.b - self.a;
         let edge2 = self.c - self.a;
-        Vec3::normalize(Vec3::cross(edge1, edge2))
+        Vec3::normalized(Vec3::cross(edge1, edge2))
     }
 }
 

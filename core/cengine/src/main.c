@@ -21,6 +21,9 @@ struct Vec2{
     float y;
 };
 
+struct Vec2 mousepos;
+struct Vec2 mousedelta;
+
 int is_key_pressed(int keycode){
     return glfwGetKey(window, keycode);
 }
@@ -63,13 +66,19 @@ void mouse_callback(GLFWwindow* window, int button, int action, int mods){
     }
 }
 
+void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos){
+    mousedelta.x += xpos - mousepos.x;
+    mousedelta.y += ypos - mousepos.y;
+    mousepos.x = xpos;
+    mousepos.y = ypos;
+}
+
 struct Vec2 get_mouse_position(){
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
-    struct Vec2 v;
-    v.x = xpos;
-    v.y = ypos;
-    return v;
+    return mousepos;
+}
+
+struct Vec2 get_mouse_delta(){
+    return mousedelta;
 }
 
 void enable_depth_test(){
@@ -199,6 +208,8 @@ void poll_events(){
     keyup = -1;
     mousedown = -1;
     mouseup = -1;
+    mousedelta.x = 0;
+    mousedelta.y = 0;
     glfwPollEvents();
 }
 
@@ -233,9 +244,15 @@ void initialize(int screenWidth, int screenHeight)
         printf("Failed to initialize GLAD");
         return;
     }
-
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    mousepos.x = xpos;
+    mousepos.y = ypos;
+    mousedelta.x = 0;
+    mousedelta.y = 0;
     glfwSetKeyCallback(window, key_callback);
     glfwSetMouseButtonCallback(window, mouse_callback);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
 }
 
 unsigned int createShader(const char* source, int shaderType)

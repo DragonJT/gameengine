@@ -25,6 +25,7 @@ unsafe extern "C" {
     pub fn is_mouse_down(button: i32) -> i32;
     pub fn is_mouse_up(button: i32) -> i32;
     pub fn get_mouse_position() -> math::Vec2;
+    pub fn get_mouse_delta() -> math::Vec2;
     pub fn enable_depth_test();
     pub fn disable_depth_test();
     pub fn cull_back_faces();

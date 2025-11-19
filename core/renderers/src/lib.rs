@@ -185,6 +185,12 @@ pub fn get_mouse_position() -> Vec2 {
     }
 }
 
+pub fn get_mouse_delta() -> Vec2 {
+    unsafe {
+        return c::get_mouse_delta();
+    }
+}
+
 pub fn window_should_close() -> bool {
     unsafe {
         return c::window_should_close() != 0;

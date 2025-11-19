@@ -1,6 +1,6 @@
 use crate::c;
 use crate::helper_functions::*;
-use math::{mat4::*, *};
+use math::{mat4::*, rect::*, *};
 
 pub struct TextRenderer {
     vertices: Vec<f32>,
@@ -11,12 +11,12 @@ pub struct TextRenderer {
     vao: u32,
     vbo: u32,
     program: u32,
-    font_height: f32,
+    fontheight: f32,
 }
 
 impl TextRenderer {
-    pub fn new(ttf_path: &str, font_height: f32, atlas_size: i32) -> Self {
-        let fontdata = create_font_data(ttf_path, font_height, atlas_size, atlas_size);
+    pub fn new(ttf_path: &str, fontheight: f32, atlas_size: i32) -> Self {
+        let fontdata = create_font_data(ttf_path, fontheight, atlas_size, atlas_size);
 
         let vertex_source = "#version 330 core
         layout (location = 0) in vec2 aPos;
@@ -68,7 +68,7 @@ impl TextRenderer {
                 vao,
                 vbo,
                 program,
-                font_height,
+                fontheight: fontheight,
             };
         }
     }
@@ -147,16 +147,16 @@ impl TextRenderer {
         self.draw_triangle(&pos.tri2(), &uv.tri2(), color);
     }
 
-    pub fn draw_char(&mut self, x: f32, y: f32, c: char, font_height: f32, color: &Color) -> f32 {
+    pub fn draw_char(&mut self, x: f32, y: f32, c: char, fontheight: f32, color: &Color) -> f32 {
         let fontdata = get_baked(&self.fontdata, c);
         return match fontdata {
             Some(baked) => {
-                let fontscale = font_height / self.font_height;
+                let fontscale = fontheight / self.fontheight;
                 let bw = (baked.x1 - baked.x0) as f32;
                 let bh = (baked.y1 - baked.y0) as f32;
                 let prect = Rect {
                     x: x + baked.xoff as f32 * fontscale,
-                    y: y + baked.yoff as f32 * fontscale + font_height,
+                    y: y + baked.yoff as f32 * fontscale + fontheight,
                     w: bw * fontscale,
                     h: bh * fontscale,
                 };
@@ -178,27 +178,27 @@ impl TextRenderer {
         &mut self,
         position: &Vec2,
         text: &str,
-        font_height: f32,
+        fontheight: f32,
         color: &Color,
     ) -> f32 {
         let mut posx = position.x;
         for c in text.chars() {
-            posx += self.draw_char(posx, position.y, c, font_height, color);
+            posx += self.draw_char(posx, position.y, c, fontheight, color);
         }
         return posx - position.x;
     }
 
-    pub fn measure_char(&mut self, c: char, font_height: f32) -> f32 {
+    pub fn measure_char(&mut self, c: char, fontheight: f32) -> f32 {
         return match get_baked(&self.fontdata, c) {
-            Some(baked) => baked.xadvance * font_height / self.font_height,
+            Some(baked) => baked.xadvance * fontheight / self.fontheight,
             None => 0.0,
         };
     }
 
-    pub fn measure_text(&mut self, text: &str, font_height: f32) -> f32 {
+    pub fn measure_text(&mut self, text: &str, fontheight: f32) -> f32 {
         let mut width = 0.0;
         for c in text.chars() {
-            width += self.measure_char(c, font_height);
+            width += self.measure_char(c, fontheight);
         }
         return width;
     }

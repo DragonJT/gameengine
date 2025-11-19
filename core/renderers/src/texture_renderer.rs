@@ -1,6 +1,6 @@
 use crate::c;
 use crate::helper_functions::*;
-use math::{mat4::*, texture::*, *};
+use math::{mat4::*, rect::*, texture::*, *};
 
 pub struct TextureRenderer {
     vertices: Vec<f32>,

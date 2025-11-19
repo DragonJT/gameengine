@@ -1,5 +1,6 @@
 pub mod mat4;
 pub mod quat;
+pub mod rect;
 pub mod texture;
 pub mod vec3;
 use crate::vec3::*;
@@ -44,80 +45,6 @@ impl Vec2 {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub struct Rect {
-    pub x: f32,
-    pub y: f32,
-    pub w: f32,
-    pub h: f32,
-}
-
-impl Rect {
-    pub fn new(x: f32, y: f32, w: f32, h: f32) -> Self {
-        Rect { x, y, w, h }
-    }
-
-    pub fn from_vec2s(pos: Vec2, size: Vec2) -> Self {
-        Rect {
-            x: pos.x,
-            y: pos.y,
-            w: size.x,
-            h: size.y,
-        }
-    }
-
-    pub fn topleft(&self) -> Vec2 {
-        Vec2 {
-            x: self.x,
-            y: self.y,
-        }
-    }
-
-    pub fn a(&self) -> Vec2 {
-        Vec2 {
-            x: self.x,
-            y: self.y,
-        }
-    }
-
-    pub fn b(&self) -> Vec2 {
-        Vec2 {
-            x: self.x + self.w,
-            y: self.y,
-        }
-    }
-
-    pub fn c(&self) -> Vec2 {
-        Vec2 {
-            x: self.x + self.w,
-            y: self.y + self.h,
-        }
-    }
-
-    pub fn d(&self) -> Vec2 {
-        Vec2 {
-            x: self.x,
-            y: self.y + self.h,
-        }
-    }
-
-    pub fn tri1(&self) -> Triangle2 {
-        Triangle2 {
-            a: self.a(),
-            b: self.b(),
-            c: self.c(),
-        }
-    }
-
-    pub fn tri2(&self) -> Triangle2 {
-        Triangle2 {
-            a: self.a(),
-            b: self.c(),
-            c: self.d(),
-        }
-    }
-}
-
-#[derive(Clone, Copy, Debug)]
 pub struct Color {
     pub r: f32,
     pub g: f32,
@@ -133,6 +60,7 @@ impl Color {
     pub fn black() -> Color {
         Color::new(0.0, 0.0, 0.0, 1.0)
     }
+
     pub fn blue() -> Color {
         Color::new(0.0, 0.0, 1.0, 1.0)
     }

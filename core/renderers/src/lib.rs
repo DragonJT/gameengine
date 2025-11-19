@@ -145,6 +145,10 @@ pub enum Key {
     Menu = 348,
 }
 
+pub fn is_control() -> bool {
+    is_key_pressed(Key::LeftControl) || is_key_pressed(Key::RightControl)
+}
+
 pub fn get_char() -> Option<char> {
     unsafe {
         let ch = c::get_char();

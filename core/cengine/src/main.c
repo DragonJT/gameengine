@@ -8,6 +8,7 @@
 GLFWwindow* window;
 int keydown;
 int keyup;
+int keyrepeat;
 int mousedown;
 int mouseup;
 unsigned int c;
@@ -34,7 +35,7 @@ int is_mouse_pressed(int button){
 }
 
 int is_key_down(int key){
-    return keydown == key;
+    return keydown == key || keyrepeat == key;
 }
 
 int is_key_up(int key){
@@ -59,6 +60,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     else if(action == GLFW_RELEASE){
         keyup = key;
+    }
+    else if(action == GLFW_REPEAT){
+        keyrepeat = key;
     }
 }
 
@@ -215,6 +219,7 @@ void swap_buffers(){
 void poll_events(){
     keydown = -1;
     keyup = -1;
+    keyrepeat = -1;
     mousedown = -1;
     mouseup = -1;
     mousedelta.x = 0;

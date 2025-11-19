@@ -23,6 +23,15 @@ impl Rect {
         }
     }
 
+    pub fn lower_top(&self, amount: f32) -> Self {
+        Rect {
+            x: self.x,
+            y: self.y + amount,
+            w: self.w,
+            h: self.h - amount,
+        }
+    }
+
     pub fn expand(&self, amount: f32) -> Self {
         Rect {
             x: self.x - amount,

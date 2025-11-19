@@ -1,6 +1,7 @@
 use math::{rect::*, *};
 use renderers::{text_renderer::*, *};
 
+#[derive(Clone, Copy)]
 enum Element {
     None,
     Textbox(usize),
@@ -17,9 +18,14 @@ struct TextBox {
     pub value: String,
 }
 
-struct UI {
+struct Style {
+    pub node_border: f32,
     pub fontheight: f32,
     pub lineheight: f32,
+}
+
+struct UI {
+    pub style: Style,
     pub textboxes: Vec<TextBox>,
     pub nodes: Vec<Node>,
     pub dragging: Element,
@@ -29,8 +35,11 @@ struct UI {
 impl UI {
     pub fn new(fontheight: f32) -> Self {
         UI {
-            fontheight,
-            lineheight: fontheight * 1.3,
+            style: Style {
+                fontheight: fontheight * 1.2,
+                lineheight: fontheight * 1.6,
+                node_border: 20.0,
+            },
             textboxes: vec![],
             nodes: vec![],
             dragging: Element::None,
@@ -39,7 +48,7 @@ impl UI {
     }
 
     pub fn add_textbox(&mut self, position: Vec2, value: String) -> Element {
-        let size = Vec2::new(400.0, self.fontheight);
+        let size = Vec2::new(400.0, self.style.fontheight);
         self.textboxes.push(TextBox {
             rect: Rect::from_vec2s(position, size),
             value,
@@ -47,20 +56,46 @@ impl UI {
         Element::Textbox(self.textboxes.len() - 1)
     }
 
-    pub fn add_node(&mut self, position: Vec2, inputs: Vec<&str>) -> Element {
-        let size = Vec2::new(500.0, inputs.len() as f32 * self.lineheight);
-        let mut elements: Vec<Element> = vec![];
-        let x = position.x;
-        let mut y = position.y;
-        for i in inputs {
-            elements.push(self.add_textbox(Vec2::new(x, y), i.to_string()));
-            y += self.lineheight;
+    fn set_element_rect(&mut self, element: &Element, rect: Rect) {
+        match element {
+            Element::Textbox(tb) => {
+                self.textboxes[*tb].rect = rect;
+            }
+            _ => {}
         }
-        self.nodes.push(Node {
-            rect: Rect::from_vec2s(position, size),
-            elements,
-        });
+    }
+
+    fn set_elements_rect(&mut self, elements: &Vec<Element>, rect: Rect) {
+        let x = rect.x;
+        let mut y = rect.y;
+        let w = rect.w;
+        for e in elements {
+            self.set_element_rect(e, Rect::new(x, y, w, self.style.fontheight));
+            y += self.style.lineheight;
+        }
+    }
+
+    pub fn add_node(&mut self, position: Vec2, inputs: Vec<&str>) -> Element {
+        let size = Vec2::new(500.0, inputs.len() as f32 * self.style.lineheight + 40.0);
+        let rect = Rect::from_vec2s(position, size);
+        let mut elements: Vec<Element> = vec![];
+
+        for i in inputs {
+            elements.push(self.add_textbox(Vec2::new(0.0, 0.0), i.to_string()));
+        }
+        let elements_rect = rect.expand(-self.style.node_border);
+        self.set_elements_rect(&elements, elements_rect);
+
+        self.nodes.push(Node { rect, elements });
         Element::Node(self.nodes.len() - 1)
+    }
+
+    pub fn get_children(&mut self, element: Element) -> Vec<Element> {
+        return match element {
+            Element::Textbox(_) => vec![],
+            Element::Node(n) => self.nodes[n].elements.clone(),
+            Element::None => vec![],
+        };
     }
 
     pub fn mousedown(&mut self, mousepos: Vec2) {
@@ -84,7 +119,10 @@ impl UI {
     pub fn mousedrag(&mut self, mousedelta: Vec2) {
         match self.dragging {
             Element::Node(n) => {
-                self.nodes[n.clone()].rect = self.nodes[n.clone()].rect + mousedelta;
+                let rect = self.nodes[n.clone()].rect + mousedelta;
+                self.nodes[n.clone()].rect = rect;
+                let elements = self.get_children(self.dragging);
+                self.set_elements_rect(&elements.clone(), rect.expand(-self.style.node_border));
             }
             Element::Textbox(t) => {}
             Element::None => {}

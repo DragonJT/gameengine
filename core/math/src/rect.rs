@@ -23,6 +23,15 @@ impl Rect {
         }
     }
 
+    pub fn expand(&self, amount: f32) -> Self {
+        Rect {
+            x: self.x - amount,
+            y: self.y - amount,
+            w: self.w + amount * 2.0,
+            h: self.h + amount * 2.0,
+        }
+    }
+
     pub fn contains(&self, v: &Vec2) -> bool {
         v.x >= self.x && v.x <= self.x + self.w && v.y >= self.y && v.y <= self.y + self.h
     }

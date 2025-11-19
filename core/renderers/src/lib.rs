@@ -1,3 +1,5 @@
+use std::char;
+
 use math::*;
 mod c;
 mod helper_functions;
@@ -141,6 +143,16 @@ pub enum Key {
     RightSuper = 347,
 
     Menu = 348,
+}
+
+pub fn get_char() -> Option<char> {
+    unsafe {
+        let ch = c::get_char();
+        if ch != 0 {
+            return char::from_u32(ch);
+        }
+        None
+    }
 }
 
 pub fn is_key_down(key: Key) -> bool {

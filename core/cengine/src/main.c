@@ -10,6 +10,7 @@ int keydown;
 int keyup;
 int mousedown;
 int mouseup;
+unsigned int c;
 
 struct Vec2i{
     int x;
@@ -48,6 +49,10 @@ int is_mouse_up(int button){
     return mouseup == button;
 }
 
+unsigned int get_char(){
+    return c;
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
     if(action == GLFW_PRESS){
         keydown = key;
@@ -71,6 +76,10 @@ void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos){
     mousedelta.y += ypos - mousepos.y;
     mousepos.x = xpos;
     mousepos.y = ypos;
+}
+
+void char_callback(GLFWwindow* window, unsigned int codepoint){
+    c = codepoint;
 }
 
 struct Vec2 get_mouse_position(){
@@ -210,6 +219,7 @@ void poll_events(){
     mouseup = -1;
     mousedelta.x = 0;
     mousedelta.y = 0;
+    c = 0;
     glfwPollEvents();
 }
 
@@ -253,6 +263,7 @@ void initialize(int screenWidth, int screenHeight)
     glfwSetKeyCallback(window, key_callback);
     glfwSetMouseButtonCallback(window, mouse_callback);
     glfwSetCursorPosCallback(window, cursor_pos_callback);
+    glfwSetCharCallback(window, char_callback);
 }
 
 unsigned int createShader(const char* source, int shaderType)

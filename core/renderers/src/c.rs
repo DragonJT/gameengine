@@ -18,6 +18,7 @@ pub struct FontData {
 }
 
 unsafe extern "C" {
+    pub fn get_char() -> u32;
     pub fn is_key_pressed(key: i32) -> i32;
     pub fn is_mouse_pressed(button: i32) -> i32;
     pub fn is_key_down(key: i32) -> i32;

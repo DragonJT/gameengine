@@ -1,7 +1,7 @@
 mod compile;
 mod visual_scripting;
 use compile::*;
-use math::*;
+use math::{rect::Rect, *};
 use renderers::{text_renderer::*, *};
 use visual_scripting::*;
 
@@ -23,7 +23,7 @@ fn main() {
 
         if is_control() {
             if is_key_down(Key::R) {
-                run();
+                run(&mut ui);
             }
         } else {
             if is_key_down(Key::Enter) {
@@ -48,10 +48,11 @@ fn main() {
         }
 
         for n in &ui.nodes {
-            text_renderer.draw_rect(&n.rect, &Color::new(0.9, 0.9, 0.9, 1.0));
-            text_renderer.draw_rect_outline(&n.rect, &Color::black(), 2.0);
+            let rect = Rect::from_vec2s(n.position, n.size);
+            text_renderer.draw_rect(&rect, &Color::new(0.9, 0.9, 0.9, 1.0));
+            text_renderer.draw_rect_outline(&rect, &Color::black(), 2.0);
             text_renderer.draw_text(
-                &n.rect.topleft(),
+                &n.position,
                 &n.name,
                 ui.style.fontheight,
                 &ui.style.node_header_color,
@@ -75,9 +76,10 @@ fn main() {
                 }
                 None => {}
             }
-            text_renderer.draw_rect(&t.rect, &Color::white());
-            text_renderer.draw_rect_outline(&t.rect, &color, 2.0);
-            text_renderer.draw_text(&t.rect.topleft(), &t.value, fontheight, &Color::black());
+            let rect = Rect::from_vec2s(t.position, t.size);
+            text_renderer.draw_rect(&rect, &Color::white());
+            text_renderer.draw_rect_outline(&rect, &color, 2.0);
+            text_renderer.draw_text(&t.position, &t.value, fontheight, &Color::black());
         }
         text_renderer.render();
 

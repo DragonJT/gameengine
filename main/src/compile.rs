@@ -1,16 +1,23 @@
+use crate::visual_scripting::*;
 use std::fs::File;
 use std::io::Write;
 use std::process::*;
 
-pub fn run() {
+pub fn run(ui: &mut UI) {
+    let node0 = Element::Node(0);
+    let children = ui.get_children(node0);
+    let value = ui.get_editable_text(children[0]).unwrap();
+
+    let code = format!(
+        r#"fn main() {{
+        println!("{}");
+    }}"#,
+        value
+    );
+
     let mut f =
         File::create("/home/jonathan/Documents/project/src/main.rs").expect("cant create file");
-    f.write_all(
-        b"fn main(){
-        println!(\"HelloWorld\");
-    }",
-    )
-    .expect("cant write to file");
+    f.write_all(code.as_bytes()).expect("cant write to file");
 
     // Run `cargo run`
     let mut status = Command::new("cargo")

@@ -1,5 +1,4 @@
 use crate::*;
-use std::ops::Add;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Rect {
@@ -101,14 +100,5 @@ impl Rect {
             b: self.c(),
             c: self.d(),
         }
-    }
-}
-
-impl Add<Vec2> for Rect {
-    type Output = Rect;
-
-    #[inline]
-    fn add(self, rhs: Vec2) -> Rect {
-        Rect::new(self.x + rhs.x, self.y + rhs.y, self.w, self.h)
     }
 }

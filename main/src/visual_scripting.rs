@@ -7,7 +7,8 @@ pub enum Element {
 }
 
 pub struct Node {
-    pub rect: Rect,
+    pub position: Vec2,
+    pub size: Vec2,
     pub name: String,
     pub elements: Vec<Element>,
 }
@@ -19,7 +20,8 @@ pub struct Label {
 
 pub struct Textbox {
     pub label: Option<Label>,
-    pub rect: Rect,
+    pub position: Vec2,
+    pub size: Vec2,
     pub value: String,
 }
 
@@ -67,7 +69,8 @@ impl UI {
         };
         self.textboxes.push(Textbox {
             label,
-            rect: Rect::from_vec2s(position, size),
+            position,
+            size,
             value: "".to_string(),
         });
         Element::Textbox(self.textboxes.len() - 1)
@@ -102,25 +105,61 @@ impl UI {
         }
     }
 
-    fn set_rect(&mut self, element: Element, rect: Rect) {
+    fn set_position(&mut self, element: Element, position: Vec2) {
         match element {
-            Element::Textbox(tb) => {
-                self.textboxes[tb].rect = rect;
-            }
-            _ => {}
+            Element::Textbox(t) => self.textboxes[t].position = position,
+            Element::Node(n) => self.nodes[n].position = position,
         }
+    }
+
+    fn set_size(&mut self, element: Element, size: Vec2) {
+        match element {
+            Element::Textbox(t) => self.textboxes[t].size = size,
+            Element::Node(n) => self.nodes[n].size = size,
+        }
+    }
+
+    fn get_position(&mut self, element: Element) -> Vec2 {
+        match element {
+            Element::Textbox(t) => self.textboxes[t].position,
+            Element::Node(n) => self.nodes[n].position,
+        }
+    }
+
+    fn get_size(&mut self, element: Element) -> Vec2 {
+        match element {
+            Element::Textbox(t) => self.textboxes[t].size,
+            Element::Node(n) => self.nodes[n].size,
+        }
+    }
+
+    fn get_rect(&mut self, element: Element) -> Rect {
+        let pos = self.get_position(element);
+        let size = self.get_size(element);
+        Rect::from_vec2s(pos, size)
     }
 
     fn layout_elements(&mut self, elements: &Vec<Element>, rect: Rect) {
         let x = rect.x;
         let mut y = rect.y;
-        let w = rect.w;
+        let lh = self.style.lineheight;
+        let w = rect.w - lh;
         for e in elements {
-            self.set_label_position(e.clone(), Vec2::new(x, y));
-            y += self.style.lineheight;
-            self.set_rect(e.clone(), Rect::new(x, y, w, self.style.fontheight));
-            y += self.style.lineheight;
+            self.set_label_position(e.clone(), Vec2::new(x + lh, y));
+            y += lh;
+            self.set_position(e.clone(), Vec2::new(x + lh, y));
+            self.set_size(e.clone(), Vec2::new(w, self.style.fontheight));
+            y += lh;
         }
+    }
+
+    fn layout_node(&mut self, node: usize) {
+        let elements_rect = self
+            .get_rect(Element::Node(node))
+            .lower_top(self.style.lineheight)
+            .expand(-self.style.node_border);
+        let elements = self.nodes[node].elements.clone();
+        self.layout_elements(&elements, elements_rect);
     }
 
     pub fn add_node(&mut self, position: Vec2, name: &str, inputs: Vec<&str>) -> Element {
@@ -128,23 +167,20 @@ impl UI {
             500.0,
             inputs.len() as f32 * self.style.lineheight * 2.0 + self.style.lineheight + 40.0,
         );
-        let rect = Rect::from_vec2s(position, size);
         let mut elements: Vec<Element> = vec![];
-
         for i in inputs {
             elements.push(self.add_textbox(Vec2::new(0.0, 0.0), Some(i.to_string())));
         }
-        let elements_rect = rect
-            .lower_top(self.style.lineheight)
-            .expand(-self.style.node_border);
-        self.layout_elements(&elements, elements_rect);
 
         self.nodes.push(Node {
-            rect,
+            position,
+            size,
             name: name.to_string(),
             elements,
         });
-        Element::Node(self.nodes.len() - 1)
+        let id = self.nodes.len() - 1;
+        self.layout_node(id);
+        Element::Node(id)
     }
 
     pub fn get_children(&mut self, element: Element) -> Vec<Element> {
@@ -157,15 +193,15 @@ impl UI {
     pub fn mousedown(&mut self, mousepos: Vec2) {
         self.selected = None;
         for i in 0..self.textboxes.len() {
-            let t = &self.textboxes[i];
-            if t.rect.contains(&mousepos) {
+            let rect = self.get_rect(Element::Textbox(i));
+            if rect.contains(&mousepos) {
                 self.selected = Some(Element::Textbox(i));
                 return;
             }
         }
         for i in 0..self.nodes.len() {
-            let n = &self.nodes[i];
-            if n.rect.contains(&mousepos) {
+            let rect = self.get_rect(Element::Node(i));
+            if rect.contains(&mousepos) {
                 self.dragging = Some(Element::Node(i));
                 return;
             }
@@ -175,19 +211,11 @@ impl UI {
     pub fn mousedrag(&mut self, mousedelta: Vec2) {
         match self.dragging {
             Some(d) => match d {
-                Element::Node(n) => match self.dragging {
-                    Some(d) => {
-                        let rect = self.nodes[n.clone()].rect + mousedelta;
-                        self.nodes[n.clone()].rect = rect;
-                        let elements = self.get_children(d);
-                        self.layout_elements(
-                            &elements.clone(),
-                            rect.lower_top(self.style.lineheight)
-                                .expand(-self.style.node_border),
-                        );
-                    }
-                    None => {}
-                },
+                Element::Node(n) => {
+                    let position = self.get_position(d);
+                    self.set_position(d, position + mousedelta);
+                    self.layout_node(n);
+                }
                 Element::Textbox(_) => {}
             },
             None => {}

@@ -4,6 +4,7 @@ pub mod rect;
 pub mod texture;
 pub mod vec3;
 use crate::vec3::*;
+use std::ops::Add;
 
 pub struct Triangle2 {
     pub a: Vec2,
@@ -32,7 +33,7 @@ pub struct Vec2i {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
@@ -41,6 +42,15 @@ pub struct Vec2 {
 impl Vec2 {
     pub fn new(x: f32, y: f32) -> Vec2 {
         Vec2 { x, y }
+    }
+}
+
+impl Add for Vec2 {
+    type Output = Vec2;
+
+    #[inline]
+    fn add(self, rhs: Vec2) -> Vec2 {
+        Vec2::new(self.x + rhs.x, self.y + rhs.y)
     }
 }
 

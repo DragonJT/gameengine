@@ -101,23 +101,23 @@ impl TextRenderer {
         self.vertex_count = 0;
     }
 
-    pub fn draw_triangle(&mut self, pos: &Triangle2, uv: &Triangle2, color: &Color) {
+    fn draw_uv_triangle(&mut self, pos: Triangle2, uv: Triangle2, color: Color) {
         let vertices = &mut self.vertices;
         self.vertex_count += 3;
-        add_vector2(vertices, &pos.a);
-        add_vector2(vertices, &uv.a);
+        add_vector2(vertices, pos.a);
+        add_vector2(vertices, uv.a);
         add_color(vertices, color);
 
-        add_vector2(vertices, &pos.c);
-        add_vector2(vertices, &uv.c);
+        add_vector2(vertices, pos.c);
+        add_vector2(vertices, uv.c);
         add_color(vertices, color);
 
-        add_vector2(vertices, &pos.b);
-        add_vector2(vertices, &uv.b);
+        add_vector2(vertices, pos.b);
+        add_vector2(vertices, uv.b);
         add_color(vertices, color);
     }
 
-    pub fn draw_rect(&mut self, rect: &Rect, color: &Color) {
+    pub fn draw_triangle(&mut self, pos: Triangle2, color: Color) {
         let uv = (self.atlas_size as f32 - 0.5) / self.atlas_size as f32;
         let uv_pos = Vec2 { x: uv, y: uv };
         let uv_tri = Triangle2 {
@@ -125,29 +125,33 @@ impl TextRenderer {
             b: uv_pos.clone(),
             c: uv_pos.clone(),
         };
-        self.draw_triangle(&rect.tri1(), &uv_tri, color);
-        self.draw_triangle(&rect.tri2(), &uv_tri, color);
+        self.draw_uv_triangle(pos, uv_tri, color);
     }
 
-    pub fn draw_rect_outline(&mut self, rect: &Rect, color: &Color, width: f32) {
-        self.draw_rect(&Rect::new(rect.x, rect.y, rect.w, width), color);
-        self.draw_rect(&Rect::new(rect.x, rect.y, width, rect.h), color);
+    pub fn draw_rect(&mut self, rect: Rect, color: Color) {
+        self.draw_triangle(rect.tri1(), color);
+        self.draw_triangle(rect.tri2(), color);
+    }
+
+    pub fn draw_rect_outline(&mut self, rect: Rect, color: Color, thickness: f32) {
+        self.draw_rect(Rect::new(rect.x, rect.y, rect.w, thickness), color);
+        self.draw_rect(Rect::new(rect.x, rect.y, thickness, rect.h), color);
         self.draw_rect(
-            &Rect::new(rect.x, rect.y + rect.h - width, rect.w, width),
+            Rect::new(rect.x, rect.y + rect.h - thickness, rect.w, thickness),
             color,
         );
         self.draw_rect(
-            &Rect::new(rect.x + rect.w - width, rect.y, width, rect.h),
+            Rect::new(rect.x + rect.w - thickness, rect.y, thickness, rect.h),
             color,
         );
     }
 
-    pub fn draw_rect_uv(&mut self, pos: &Rect, uv: &Rect, color: &Color) {
-        self.draw_triangle(&pos.tri1(), &uv.tri1(), color);
-        self.draw_triangle(&pos.tri2(), &uv.tri2(), color);
+    pub fn draw_rect_uv(&mut self, pos: Rect, uv: Rect, color: Color) {
+        self.draw_uv_triangle(pos.tri1(), uv.tri1(), color);
+        self.draw_uv_triangle(pos.tri2(), uv.tri2(), color);
     }
 
-    pub fn draw_char(&mut self, x: f32, y: f32, c: char, fontheight: f32, color: &Color) -> f32 {
+    pub fn draw_char(&mut self, x: f32, y: f32, c: char, fontheight: f32, color: Color) -> f32 {
         let fontdata = get_baked(&self.fontdata, c);
         return match fontdata {
             Some(baked) => {
@@ -167,20 +171,14 @@ impl TextRenderer {
                     h: bh / self.atlas_size as f32,
                 };
                 let advance = baked.xadvance * fontscale;
-                self.draw_rect_uv(&prect, &uvrect, color);
+                self.draw_rect_uv(prect, uvrect, color);
                 advance
             }
             None => 0.0,
         };
     }
 
-    pub fn draw_text(
-        &mut self,
-        position: &Vec2,
-        text: &str,
-        fontheight: f32,
-        color: &Color,
-    ) -> f32 {
+    pub fn draw_text(&mut self, position: Vec2, text: &str, fontheight: f32, color: Color) -> f32 {
         let mut posx = position.x;
         for c in text.chars() {
             posx += self.draw_char(posx, position.y, c, fontheight, color);

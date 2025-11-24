@@ -14,7 +14,7 @@ fn main() {
     println!("cargo:rustc-link-lib=static=cengine");
 
     // Link GLFW + system libs (Linux)
-    println!("cargo:rustc-link-lib=dylib=glad");
+    println!("cargo:rustc-link-lib=static=glad");
     println!("cargo:rustc-link-lib=dylib=glfw");
     println!("cargo:rustc-link-lib=dylib=dl");
     println!("cargo:rustc-link-lib=dylib=pthread");

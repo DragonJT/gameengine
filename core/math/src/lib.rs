@@ -3,15 +3,29 @@ pub mod quat;
 pub mod rect;
 pub mod texture;
 pub mod vec3;
-use crate::vec3::*;
-use std::ops::Add;
+use crate::{mat4::Mat4, vec3::*};
+use std::ops::{Add, Mul};
 
+#[derive(Copy, Clone, Debug)]
 pub struct Triangle2 {
     pub a: Vec2,
     pub b: Vec2,
     pub c: Vec2,
 }
+impl Triangle2 {
+    pub fn new(a: Vec2, b: Vec2, c: Vec2) -> Triangle2 {
+        Triangle2 { a, b, c }
+    }
 
+    pub fn mul(&self, mat: Mat4) -> Triangle2 {
+        let a = mat * self.a;
+        let b = mat * self.b;
+        let c = mat * self.c;
+        Triangle2 { a, b, c }
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
 pub struct Triangle3 {
     pub a: Vec3,
     pub b: Vec3,
@@ -42,6 +56,10 @@ pub struct Vec2 {
 impl Vec2 {
     pub fn new(x: f32, y: f32) -> Vec2 {
         Vec2 { x, y }
+    }
+
+    pub fn to_vec3(&self) -> Vec3 {
+        Vec3::new(self.x, self.y, 0.0)
     }
 }
 

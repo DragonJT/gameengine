@@ -95,12 +95,12 @@ impl LitRenderer {
 
     pub fn render(
         &mut self,
-        model: &Mat4,
-        view: &Mat4,
-        projection: &Mat4,
-        view_pos: &Vec3,
-        light_pos: &Vec3,
-        light_color: &Color,
+        model: Mat4,
+        view: Mat4,
+        projection: Mat4,
+        view_pos: Vec3,
+        light_pos: Vec3,
+        light_color: Color,
     ) {
         unsafe {
             c::bind_program(self.program);
@@ -114,25 +114,25 @@ impl LitRenderer {
             set_matrix4(self.program, "projection", projection.to_f32_ptr());
             set_vector3(self.program, "viewPos", view_pos);
             set_vector3(self.program, "lightPos", light_pos);
-            set_vector3(self.program, "lightColor", &light_color.to_vec3());
+            set_vector3(self.program, "lightColor", light_color.to_vec3());
             c::draw_triangle_arrays(self.vertex_count);
         }
     }
 
-    pub fn draw_triangle(&mut self, pos: &Triangle3, normal: &Triangle3, uv: &Triangle2) {
+    pub fn draw_triangle(&mut self, pos: Triangle3, normal: Triangle3, uv: Triangle2) {
         let vertices = &mut self.vertices;
         self.vertex_count += 3;
-        add_vector3(vertices, &pos.a);
-        add_vector3(vertices, &normal.a);
-        add_vector2(vertices, &uv.a);
+        add_vector3(vertices, pos.a);
+        add_vector3(vertices, normal.a);
+        add_vector2(vertices, uv.a);
 
-        add_vector3(vertices, &pos.b);
-        add_vector3(vertices, &normal.b);
-        add_vector2(vertices, &uv.b);
+        add_vector3(vertices, pos.b);
+        add_vector3(vertices, normal.b);
+        add_vector2(vertices, uv.b);
 
-        add_vector3(vertices, &pos.c);
-        add_vector3(vertices, &normal.c);
-        add_vector2(vertices, &uv.c);
+        add_vector3(vertices, pos.c);
+        add_vector3(vertices, normal.c);
+        add_vector2(vertices, uv.c);
     }
 
     pub fn draw_simple_mesh(&mut self, simple_mesh: &SimpleMesh, uv: Vec2) {
@@ -148,7 +148,7 @@ impl LitRenderer {
                 b: normal.clone(),
                 c: normal.clone(),
             };
-            self.draw_triangle(&t, &normal_tri, &uv_tri);
+            self.draw_triangle(t.clone(), normal_tri, uv_tri.clone());
         }
     }
 

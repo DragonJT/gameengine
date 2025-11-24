@@ -1,4 +1,4 @@
-# Install script for directory: /home/jonathan/Documents/gameengine/core/cengine/build/_deps/glfw-src/docs
+# Install script for directory: /home/jonathan/Documents/rust/gameengine/core/cengine/build/_deps/glfw-src/docs
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

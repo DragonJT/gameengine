@@ -1,9 +1,9 @@
 
-if (NOT EXISTS "/home/jonathan/Documents/gameengine/core/cengine/build/_deps/glfw-build/install_manifest.txt")
-    message(FATAL_ERROR "Cannot find install manifest: \"/home/jonathan/Documents/gameengine/core/cengine/build/_deps/glfw-build/install_manifest.txt\"")
+if (NOT EXISTS "/home/jonathan/Documents/rust/gameengine/core/cengine/build/_deps/glfw-build/install_manifest.txt")
+    message(FATAL_ERROR "Cannot find install manifest: \"/home/jonathan/Documents/rust/gameengine/core/cengine/build/_deps/glfw-build/install_manifest.txt\"")
 endif()
 
-file(READ "/home/jonathan/Documents/gameengine/core/cengine/build/_deps/glfw-build/install_manifest.txt" files)
+file(READ "/home/jonathan/Documents/rust/gameengine/core/cengine/build/_deps/glfw-build/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})

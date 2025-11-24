@@ -1,3 +1,4 @@
+use crate::*;
 use crate::{quat::*, vec3::*};
 use std::ops::Mul;
 
@@ -100,9 +101,14 @@ impl Mat4 {
         )
     }
 
-    pub fn trs(t: Vec3, r: Quat, s: Vec3) -> Mat4 {
+    pub fn trs3d(t: Vec3, r: Quat, s: Vec3) -> Mat4 {
         Mat4::translate(t) * r.to_mat4() * Mat4::scale(s)
     }
+
+    pub fn trs2d(t: Vec2, r: f32, s: Vec2) -> Mat4 {
+        Mat4::translate(t.to_vec3()) * Mat4::rotate_z(r) * Mat4::scale(s.to_vec3())
+    }
+
     /// Transform a Vec3 as a position (Vec3 augmented with w=1).
     pub fn transform_point3(self, v: Vec3) -> Vec3 {
         let x = self.m[0] * v.x + self.m[1] * v.y + self.m[2] * v.z + self.m[3];
@@ -150,6 +156,33 @@ impl Mat4 {
         )
     }
 
+    pub fn rotate_x(angle: f32) -> Self {
+        let c = angle.cos();
+        let s = angle.sin();
+
+        Mat4::new(
+            1.0, 0.0, 0.0, 0.0, 0.0, c, -s, 0.0, 0.0, s, c, 0.0, 0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    pub fn rotate_y(angle: f32) -> Self {
+        let c = angle.cos();
+        let s = angle.sin();
+
+        Mat4::new(
+            c, 0.0, s, 0.0, 0.0, 1.0, 0.0, 0.0, -s, 0.0, c, 0.0, 0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    pub fn rotate_z(angle: f32) -> Self {
+        let c = angle.cos();
+        let s = angle.sin();
+
+        Mat4::new(
+            c, -s, 0.0, 0.0, s, c, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
     pub fn to_f32_ptr(&self) -> *const f32 {
         self.m.as_ptr()
     }
@@ -180,5 +213,13 @@ impl Mul<Vec3> for Mat4 {
 
     fn mul(self, rhs: Vec3) -> Vec3 {
         self.transform_point3(rhs)
+    }
+}
+
+impl Mul<Vec2> for Mat4 {
+    type Output = Vec2;
+
+    fn mul(self, rhs: Vec2) -> Vec2 {
+        self.transform_point3(rhs.to_vec3()).to_vec2()
     }
 }

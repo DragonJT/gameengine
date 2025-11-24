@@ -29,7 +29,7 @@ pub fn set_matrix4(program: u32, name: &str, ptr: *const f32) {
     }
 }
 
-pub fn set_vector3(program: u32, name: &str, v: &Vec3) {
+pub fn set_vector3(program: u32, name: &str, v: Vec3) {
     let a = get_cstring(name);
     unsafe {
         c::set_vector3(program, a.as_ptr(), v.x, v.y, v.z);
@@ -67,18 +67,18 @@ pub fn create_font_data(
     }
 }
 
-pub fn add_vector2(vertices: &mut Vec<f32>, v: &Vec2) {
+pub fn add_vector2(vertices: &mut Vec<f32>, v: Vec2) {
     vertices.push(v.x);
     vertices.push(v.y);
 }
 
-pub fn add_vector3(vertices: &mut Vec<f32>, v: &Vec3) {
+pub fn add_vector3(vertices: &mut Vec<f32>, v: Vec3) {
     vertices.push(v.x);
     vertices.push(v.y);
     vertices.push(v.z);
 }
 
-pub fn add_color(vertices: &mut Vec<f32>, c: &Color) {
+pub fn add_color(vertices: &mut Vec<f32>, c: Color) {
     vertices.push(c.r);
     vertices.push(c.g);
     vertices.push(c.b);

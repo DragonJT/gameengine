@@ -38,7 +38,7 @@ impl SimpleMesh {
     }
 
     pub fn add_line(&mut self, a: Vec3, b: Vec3, radius: f32) {
-        let matrix = Mat4::trs(
+        let matrix = Mat4::trs3d(
             (a + b) / 2.0,
             Quat::look_at(a, b, Vec3::new(0.0, 1.0, 0.0)),
             Vec3::new(radius / 2.0, radius / 2.0, (b - a).length() / 2.0),

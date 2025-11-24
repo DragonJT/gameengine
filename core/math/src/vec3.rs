@@ -1,4 +1,6 @@
 use std::ops::{Add, Mul, Neg, Sub};
+
+use crate::Vec2;
 /// 3D vector with `f32` components.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vec3 {
@@ -57,6 +59,10 @@ impl Vec3 {
     pub fn normalized(self) -> Vec3 {
         let len = self.length();
         if len == 0.0 { self } else { self / len }
+    }
+
+    pub fn to_vec2(self) -> Vec2 {
+        Vec2::new(self.x, self.y)
     }
 }
 

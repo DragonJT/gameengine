@@ -1,8 +1,8 @@
 CMakeFiles/cengine.dir/src/main.c.o: \
- /home/jonathan/Documents/gameengine/core/cengine/src/main.c \
+ /home/jonathan/Documents/rust/gameengine/core/cengine/src/main.c \
  /usr/include/stdc-predef.h \
- /home/jonathan/Documents/gameengine/core/cengine/external/glad/include/glad/glad.h \
- /home/jonathan/Documents/gameengine/core/cengine/external/glad/include/KHR/khrplatform.h \
+ /home/jonathan/Documents/rust/gameengine/core/cengine/external/glad/include/glad/glad.h \
+ /home/jonathan/Documents/rust/gameengine/core/cengine/external/glad/include/KHR/khrplatform.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -19,7 +19,7 @@ CMakeFiles/cengine.dir/src/main.c.o: \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
- /home/jonathan/Documents/gameengine/core/cengine/build/_deps/glfw-src/include/GLFW/glfw3.h \
+ /home/jonathan/Documents/rust/gameengine/core/cengine/build/_deps/glfw-src/include/GLFW/glfw3.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h /usr/include/stdio.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
@@ -56,7 +56,7 @@ CMakeFiles/cengine.dir/src/main.c.o: \
  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
- /home/jonathan/Documents/gameengine/core/cengine/src/stb_truetype.h \
+ /home/jonathan/Documents/rust/gameengine/core/cengine/src/stb_truetype.h \
  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \

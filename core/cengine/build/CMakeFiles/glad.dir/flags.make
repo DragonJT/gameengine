@@ -4,7 +4,7 @@
 # compile C with /usr/bin/cc
 C_DEFINES = 
 
-C_INCLUDES = -I/home/jonathan/Documents/gameengine/core/cengine/external/glad/include
+C_INCLUDES = -I/home/jonathan/Documents/rust/gameengine/core/cengine/external/glad/include
 
 C_FLAGS = -std=gnu11
 

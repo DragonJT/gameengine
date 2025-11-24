@@ -7,3 +7,4 @@ edition = "2024"
 math = { path = "../core/math" }
 renderers = { path = "../core/renderers" }
 cameras = { path="../core/cameras" }
+node_script = {path="../node_script"}

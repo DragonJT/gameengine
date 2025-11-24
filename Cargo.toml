@@ -1,2 +1,2 @@
 [workspace]
-members = ["core/renderers", "core/math", "core/cameras", "main"]
+members = ["core/renderers", "core/math", "core/cameras", "main", "node_script"]
